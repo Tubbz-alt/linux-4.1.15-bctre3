@@ -722,7 +722,31 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_gpmi_nand>;
 	status = "okay"; /* gpmi nand conflicts with SD */
-	nand-on-flash-bbt;
+
+	splash@0000000 {
+		label = "splash";
+		reg = <0x000000000 0x00400000>;
+		read-write;
+	};
+
+	dtb@400000 {
+		label = "dtb";
+		reg = <0x00400000 0x00100000>;
+		read-write;
+	};
+
+	kernel@500000 {
+		label = "kernel";
+		reg = <0x00500000 0x01000000>;
+		read-write;
+	};
+
+	rootfs@1500000 {
+		label = "rootfs";
+		reg = <0x01500000 0x3e800000>;
+		read-write;
+	};
+
 };
 
 &sata {

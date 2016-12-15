@@ -13,9 +13,10 @@
 /dts-v1/;
 
 #include "imx6q.dtsi"
+#include <dt-bindings/gpio/gpio.h>
 
 / {
-	model = "BCT RE3";
+	model = "BCT RM3";
 	compatible = "fsl,imx6q-bctre3", "fsl,imx6q";
 
 
@@ -576,8 +577,8 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usdhc1>;
 	bus-width = <4>;
-	cd-gpios = <&gpio1 1 0>;
-	wp-gpios = <&gpio2 1 9>;
+        cd-gpios = <&gpio1 1 GPIO_ACTIVE_LOW>; 
+        wp-gpios = <&gpio2 1 GPIO_ACTIVE_HIGH>;
 	no-1-8-v;
 	keep-power-in-suspend;
 	enable-sdio-wakeup;
@@ -631,8 +632,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_enet>;
 	phy-mode = "rgmii";
-	phy-reset-gpios = <&gpio7 6 1>;
-	phy-reset-gpio-active-high;
 	status = "okay";
 };
 
@@ -682,10 +681,10 @@
 };
 
 &gpmi {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_gpmi_nand>;
-	status = "okay"; /* gpmi nand conflicts with SD */
-	nand-on-flash-bbt;
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_gpmi_nand>;
+        status = "okay"; /* gpmi nand conflicts with SD */
+
 };
 
 &sata {
