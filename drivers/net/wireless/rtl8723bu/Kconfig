@@ -1,0 +1,5 @@
+config RTL8723BU
+	tristate "Realtek 8723B USB WiFi"
+        depends on MAC80211 && USB
+	---help---
+	  Driver for RTL8723 combined BT/WiFI device
