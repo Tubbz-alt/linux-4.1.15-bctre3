@@ -18,4 +18,8 @@ obj-$(CONFIG_MXC_CAMERA_OV5640_MIPI) += ov5640_camera_mipi_int.o
 adv7180_tvin-objs := adv7180.o
 obj-$(CONFIG_MXC_TVIN_ADV7180) += adv7180_tvin.o
 
+#Added to include TVP5147 support:
+tvp5147_tvin-objs := tvp5147.o
+obj-$(CONFIG_MXC_TVIN_TVP5147) += tvp5147_tvin.o
+
 obj-$(CONFIG_VIDEO_V4L2_MXC_INT_DEVICE) += v4l2-int-device.o

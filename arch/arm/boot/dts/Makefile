@@ -287,6 +287,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6dl-wandboard-revb1.dtb \
 	bctre3.dtb \
 	bctrm3.dtb \
+	bartech.dtb \
 	imx6q-arm2.dtb \
 	imx6q-pop-arm2.dtb \
 	imx6q-cm-fx6.dtb \

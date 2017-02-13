@@ -1,3 +1,4 @@
+
 if VIDEO_MXC_CAPTURE
 config VIDEO_V4L2_MXC_INT_DEVICE
        tristate
@@ -27,6 +28,12 @@ config MXC_CAMERA_OV5640_MIPI
 	---help---
 	  If you plan to use the ov5640 Camera with mipi interface in your MXC system, say Y here.
 
+config MXC_TVIN_TVP5147
+        tristate "Texas Instrument tvp5147 TV Decoder Input support"
+        depends on !VIDEO_MXC_EMMA_CAMERA && I2C
+        ---help---
+          If you plan to use the tvp5147 video decoder with your MXC system, say Y here.
+
 config MXC_TVIN_ADV7180
 	tristate "Analog Device adv7180 TV Decoder Input support"
 	depends on !VIDEO_MXC_EMMA_CAMERA && I2C
@@ -37,6 +44,7 @@ choice
 	prompt "Select Overlay Rounting"
 	default MXC_IPU_DEVICE_QUEUE_SDC
 	depends on VIDEO_MXC_IPU_CAMERA && FB_MXC_SYNC_PANEL
+
 
 config MXC_IPU_DEVICE_QUEUE_SDC
 	tristate "Queue ipu device for overlay library"
@@ -60,6 +68,7 @@ config MXC_IPU_PRP_VF_SDC
 		MEM -> SDC (FG/BG)
 
 endchoice
+
 
 config MXC_IPU_PRP_ENC
 	tristate "Pre-processor Encoder library"

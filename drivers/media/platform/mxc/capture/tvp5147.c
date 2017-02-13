@@ -144,7 +144,6 @@ static video_fmt_t video_fmts[] = {
 	 },
 };
 
-//static video_fmt_idx video_idx = TVP5147_NTSC;//TVP5147_PAL;
 static video_fmt_idx video_idx = TVP5147_PAL;
 
 static DEFINE_SEMAPHORE(mutex);
@@ -461,6 +460,7 @@ static void tvp5147_get_std(v4l2_std_id *std)
 	}
 	up(&mutex);
 
+#if 0
 	/* This assumes autodetect which this device uses. */
 	if (*std != tvp5147_data.std_id) {
 		video_idx = idx;
@@ -468,6 +468,7 @@ static void tvp5147_get_std(v4l2_std_id *std)
 		tvp5147_data.sen.pix.width = video_fmts[video_idx].raw_width;
 		tvp5147_data.sen.pix.height = video_fmts[video_idx].raw_height;
 	}
+#endif
 }
 
 
@@ -1033,7 +1034,6 @@ static void tvp5147_hard_reset(void)
 	tvp5147_write_reg(REG_OPERATION_MODE, 0x01);
 	tvp5147_write_reg(REG_OPERATION_MODE, 0x00);
 
-#if 0
 	/*
 	 * Input Select Register:
 	 * 
@@ -1072,6 +1072,7 @@ static void tvp5147_hard_reset(void)
 	 * 
 	 */
 	tvp5147_write_reg(REG_CHROMA_CONTROL2, 0x04);
+#if 0
 	/* 
 	 * Output Formatter 1 Register:
 	 * 
@@ -1081,6 +1082,7 @@ static void tvp5147_hard_reset(void)
 	 * 
 	 */
 	tvp5147_write_reg(REG_OUTPUT_FORMATTER1, 0x40);
+#endif
 	/*
 	 * Output Formatter 2 Register:
 	 * 
@@ -1091,6 +1093,7 @@ static void tvp5147_hard_reset(void)
 	 * 
 	 */ 
 	tvp5147_write_reg(REG_OUTPUT_FORMATTER2, 0x11);
+#if 0
 	/*
 	 * Output Formatter 4 Register:
 	 * 
@@ -1102,8 +1105,6 @@ static void tvp5147_hard_reset(void)
 	 */
 	tvp5147_write_reg(REG_OUTPUT_FORMATTER4, 0xAF);
 #endif
-        /* write iniitialisation sequence */
-        tvp5147_write_regs(tvp514x_reg_list_default);
 }
 
 /*! tvp5147 I2C attach function.
@@ -1174,7 +1175,7 @@ static int tvp5147_probe(struct i2c_client *client,
 	tvp5147_data.sen.streamcap.timeperframe.denominator = 30;
 	tvp5147_data.sen.streamcap.timeperframe.numerator = 1;
 	tvp5147_data.std_id = V4L2_STD_ALL;
-	video_idx = TVP5147_NOT_LOCKED;
+	video_idx = TVP5147_PAL;
 	tvp5147_data.sen.pix.width = video_fmts[video_idx].raw_width;
 	tvp5147_data.sen.pix.height = video_fmts[video_idx].raw_height;
 	/*
