@@ -1,5 +1,7 @@
 config RTL8723BU
 	tristate "Realtek 8723B USB WiFi"
+        select WIRELESS_EXT
+        select WEXT_PRIV
         depends on MAC80211 && USB
 	---help---
 	  Driver for RTL8723 combined BT/WiFI device
