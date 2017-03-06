@@ -32,6 +32,9 @@
 #include <media/v4l2-device.h>
 #include <media/v4l2-ctrls.h>
 
+#define POWER_ON 1
+#define POWER_OFF 0
+
 #define OV5640_VOLTAGE_ANALOG               2800000
 #define OV5640_VOLTAGE_DIGITAL_CORE         1500000
 #define OV5640_VOLTAGE_DIGITAL_IO           1800000
@@ -639,24 +642,24 @@ static inline void ov5640_power_down(int enable)
 {
 	gpio_set_value_cansleep(pwn_gpio, enable);
 
-	msleep(2);
+	msleep(20);
 }
 
 static inline void ov5640_reset(void)
 {
 	/* camera reset */
-	gpio_set_value_cansleep(rst_gpio, 1);
+	gpio_set_value_cansleep(rst_gpio, 0);
 
 	/* camera power down */
-	gpio_set_value_cansleep(pwn_gpio, 1);
+	gpio_set_value_cansleep(pwn_gpio, POWER_OFF);
 	msleep(5);
-	gpio_set_value_cansleep(pwn_gpio, 0);
+	gpio_set_value_cansleep(pwn_gpio, POWER_ON);
 	msleep(5);
-	gpio_set_value_cansleep(rst_gpio, 0);
-	msleep(1);
 	gpio_set_value_cansleep(rst_gpio, 1);
+	msleep(1);
+	gpio_set_value_cansleep(rst_gpio, 0);
 	msleep(5);
-	gpio_set_value_cansleep(pwn_gpio, 1);
+	gpio_set_value_cansleep(pwn_gpio, POWER_OFF);
 }
 
 static int ov5640_regulator_enable(struct device *dev)
@@ -1758,7 +1761,7 @@ static int ov5640_probe(struct i2c_client *client,
 		dev_err(dev, "no sensor pwdn pin available\n");
 		return -ENODEV;
 	}
-	retval = devm_gpio_request_one(dev, pwn_gpio, GPIOF_OUT_INIT_HIGH,
+	retval = devm_gpio_request_one(dev, pwn_gpio, GPIOF_OUT_INIT_LOW,
 					"ov5640_pwdn");
 	if (retval < 0)
 		return retval;
@@ -1769,7 +1772,7 @@ static int ov5640_probe(struct i2c_client *client,
 		dev_err(dev, "no sensor reset pin available\n");
 		return -EINVAL;
 	}
-	retval = devm_gpio_request_one(dev, rst_gpio, GPIOF_OUT_INIT_HIGH,
+	retval = devm_gpio_request_one(dev, rst_gpio, GPIOF_OUT_INIT_LOW,
 					"ov5640_reset");
 	if (retval < 0)
 		return retval;
@@ -1823,18 +1826,20 @@ static int ov5640_probe(struct i2c_client *client,
 
 	ov5640_reset();
 
-	ov5640_power_down(0);
+	ov5640_power_down(POWER_ON);
+
+	pr_info("looking for camera ov5640 hardware\n");
 
 	retval = ov5640_read_reg(OV5640_CHIP_ID_HIGH_BYTE, &chip_id_high);
 	if (retval < 0 || chip_id_high != 0x56) {
 		clk_disable_unprepare(ov5640_data.sensor_clk);
-		pr_warning("camera ov5640 is not found\n");
+		pr_warning("(subdev) camera ov5640 is not found\n");
 		return -ENODEV;
 	}
 	retval = ov5640_read_reg(OV5640_CHIP_ID_LOW_BYTE, &chip_id_low);
 	if (retval < 0 || chip_id_low != 0x40) {
 		clk_disable_unprepare(ov5640_data.sensor_clk);
-		pr_warning("camera ov5640 is not found\n");
+		pr_warning("(subdev) camera ov5640 is not found\n");
 		return -ENODEV;
 	}
 
@@ -1842,7 +1847,7 @@ static int ov5640_probe(struct i2c_client *client,
 	if (retval < 0) {
 		clk_disable_unprepare(ov5640_data.sensor_clk);
 		pr_warning("camera ov5640 init failed\n");
-		ov5640_power_down(1);
+		ov5640_power_down(POWER_OFF);
 		return retval;
 	}
 
@@ -1873,7 +1878,7 @@ static int ov5640_remove(struct i2c_client *client)
 
 	clk_unprepare(ov5640_data.sensor_clk);
 
-	ov5640_power_down(1);
+	ov5640_power_down(POWER_OFF);
 
 	if (analog_regulator)
 		regulator_disable(analog_regulator);

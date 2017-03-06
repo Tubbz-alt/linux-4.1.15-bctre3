@@ -17,7 +17,7 @@
 #include <dt-bindings/gpio/gpio.h>
 
 / {
-	model = "BARTECH HB3";
+	model = "BARTECH HB3 (c)";
 	compatible = "fsl,imx6q-bctre3", "fsl,imx6q";
 
 
@@ -647,25 +647,19 @@
  		*/
 	}; 
 
-        video_decoder: tvp5147 {
-                compatible = "tvp,tvp5147";
-                reg = <0x5C>;
+        camera: ov5640@3c {
+                compatible = "ovti,ov5640";
+                reg = <0x3C>;
                 pinctrl-names = "default";
                 pinctrl-0 = <&pinctrl_ipu1_1>;
                 clocks = <&clks IMX6QDL_CLK_CKO>;
                 clock-names = "csi_mclk";
-                DOVDD-supply = <&reg_3p3v>; /* 3.3v, enabled via 2.8 VGEN6 */
-                AVDD-supply = <&reg_3p3v>;  /* 1.8v */
-                DVDD-supply = <&reg_3p3v>;  /* 1.8v */
-                PVDD-supply = <&reg_3p3v>;  /* 1.8v */
-                pwn-gpios = <&gpio5 20 0>;
-                reset-gpios = <&gpio6 15 0>;
                 csi_id = <0>;
-                //mclk = <27000000>;
-                mclk = <20>;
+                mclk = <14300000>;
                 mclk_source = <0>;
+                pwn-gpios = <&gpio5 20 GPIO_ACTIVE_LOW>;
+                rst-gpios = <&gpio6 15 GPIO_ACTIVE_LOW>;
         };
-
 };
 
 &usdhc1 {
