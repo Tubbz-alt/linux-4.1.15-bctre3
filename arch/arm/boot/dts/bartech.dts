@@ -648,7 +648,7 @@
 	}; 
 
         camera: ov5640@3c {
-                compatible = "ovti,ov5640";
+                compatible = "ovti,ov564x";
                 reg = <0x3C>;
                 pinctrl-names = "default";
                 pinctrl-0 = <&pinctrl_ipu1_1>;
