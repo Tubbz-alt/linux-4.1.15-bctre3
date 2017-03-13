@@ -695,6 +695,14 @@
 	status = "okay";
 };
 
+&snvs_poweroff {
+        status = "okay";
+};
+
+&snvs_rtc {
+        status = "okay";
+};
+
 &wdog2 {
 	status = "disabled";
 };
