@@ -18,6 +18,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#define DEBUG
+
 #include <linux/clk.h>
 #include <linux/delay.h>
 #include <linux/device.h>
@@ -732,6 +734,8 @@ static int ov5640_driver_capability(int strength)
 {
 	u8 temp = 0;
 
+	pr_debug("ov5640_driver_capability: %d", strength);
+
 	if (strength > 4 || strength < 1) {
 		pr_err("The valid driver capability of ov5640 is 1x~4x\n");
 		return -EINVAL;
@@ -756,6 +760,8 @@ static int ov5640_get_sysclk(void)
 	int Multiplier, PreDiv, VCO, SysDiv, Pll_rdiv, Bit_div2x, sclk_rdiv;
 	int sclk_rdiv_map[] = {1, 2, 4, 8};
 	u8 regval = 0;
+
+	pr_debug("ov5640_get_sysclk");
 
 	temp1 = ov5640_read_reg(0x3034, &regval);
 	temp2 = temp1 & 0x0f;
@@ -793,6 +799,8 @@ static int ov5640_get_HTS(void)
 	int HTS;
 	u8 temp = 0;
 
+	pr_debug("ov5640_get_HTS");
+
 	HTS = ov5640_read_reg(0x380c, &temp);
 	HTS = (HTS<<8) + ov5640_read_reg(0x380d, &temp);
 	return HTS;
@@ -804,6 +812,8 @@ static int ov5640_get_VTS(void)
 	int VTS;
 	u8 temp = 0;
 
+	pr_debug("ov5640_get_VTS");
+
 	VTS = ov5640_read_reg(0x380e, &temp);
 	VTS = (VTS<<8) + ov5640_read_reg(0x380f, &temp);
 
@@ -814,6 +824,8 @@ static int ov5640_get_VTS(void)
 static int ov5640_set_VTS(int VTS)
 {
 	int temp;
+
+	pr_debug("ov5640_set_VTS");
 
 	temp = VTS & 0xff;
 	ov5640_write_reg(0x380f, temp);
@@ -829,6 +841,8 @@ static int ov5640_get_shutter(void)
 	int shutter;
 	u8 regval;
 
+	pr_debug("ov5640_get_shutter");
+
 	shutter = (ov5640_read_reg(0x03500, &regval) & 0x0f);
 
 	shutter = (shutter<<8) + ov5640_read_reg(0x3501, &regval);
@@ -841,6 +855,8 @@ static int ov5640_get_shutter(void)
 static int ov5640_set_shutter(int shutter)
 {
 	int temp;
+
+	pr_debug("ov5640_set_shutter");
 
 	shutter = shutter & 0xffff;
 	temp = shutter & 0x0f;
@@ -863,6 +879,8 @@ static int ov5640_get_gain16(void)
 	int gain16;
 	u8 regval;
 
+	pr_debug("ov5640_get_gain16");
+
 	gain16 = ov5640_read_reg(0x350a, &regval) & 0x03;
 	gain16 = (gain16<<8) + ov5640_read_reg(0x350b, &regval);
 
@@ -873,6 +891,8 @@ static int ov5640_get_gain16(void)
 static int ov5640_set_gain16(int gain16)
 {
 	int temp;
+
+	pr_debug("ov5640_set_gain16");
 
 	gain16 = gain16 & 0x3ff;
 	temp = gain16 & 0xff;
@@ -889,6 +909,8 @@ static int ov5640_get_light_freq(void)
 {
 	int temp, temp1, light_frequency;
 	u8 regval;
+
+	pr_debug("ov5640_get_light_freq");
 
 	temp = ov5640_read_reg(0x3c01, &regval);
 	if (temp & 0x80) {
@@ -920,6 +942,8 @@ static void ov5640_set_bandingfilter(void)
 {
 	int prev_VTS;
 	int band_step60, max_band60, band_step50, max_band50;
+
+	pr_debug("ov5640_set_bandingfilter");
 
 	/* read preview PCLK */
 	prev_sysclk = ov5640_get_sysclk();
@@ -953,6 +977,8 @@ static int ov5640_set_AE_target(int target)
 {
 	int fast_high, fast_low;
 
+	pr_debug("ov5640_set_AE_target");
+
 	AE_low = target * 23 / 25; /* 0.92 */
 	AE_high = target * 27 / 25; /* 1.08 */
 	fast_high = AE_high << 1;
@@ -977,6 +1003,8 @@ static int ov5640_set_night_mode(int enable)
 {
 	u8 mode;
 
+	pr_debug("ov5640_set_night_mode");
+
 	ov5640_read_reg(0x3a00, &mode);
 
 	if (enable) {
@@ -998,6 +1026,8 @@ static void ov5640_turn_on_AE_AG(int enable)
 {
 	u8 ae_ag_ctrl;
 
+	pr_debug("ov5640_turn_on_AE_AG");
+
 	ov5640_read_reg(0x3503, &ae_ag_ctrl);
 	if (enable) {
 		/* turn on auto AE/AG */
@@ -1018,6 +1048,8 @@ static int ov5640_download_firmware(struct reg_value *pModeSetting, s32 ArySize)
 	register u8 Val = 0;
 	u8 RegVal = 0;
 	int i, retval = 0;
+
+	pr_debug("ov5640_init_mode");
 
 	for (i = 0; i < ArySize; ++i, ++pModeSetting) {
 		Delay_ms = pModeSetting->u32Delay_ms;
@@ -1050,6 +1082,8 @@ static int ov5640_init_mode(void)
 {
 	struct reg_value *pModeSetting = NULL;
 	int ArySize = 0, retval = 0;
+
+	pr_debug("ov5640_init_mode");
 
 	ov5640_soft_reset();
 
@@ -1092,6 +1126,8 @@ static int ov5640_change_mode_direct(enum ov5640_frame_rate frame_rate,
 	struct reg_value *pModeSetting = NULL;
 	s32 ArySize = 0;
 	int retval = 0;
+
+	pr_debug("ov5640_change_mode_direct");
 
 	if (mode > ov5640_mode_MAX || mode < ov5640_mode_MIN) {
 		pr_err("Wrong ov5640 mode detected!\n");
@@ -1157,6 +1193,8 @@ static int ov5640_change_mode_exposure_calc(enum ov5640_frame_rate frame_rate,
 	struct reg_value *pModeSetting = NULL;
 	s32 ArySize = 0;
 	int retval = 0;
+
+	pr_debug("ov5640_change_mode_exposure_calc");
 
 	/* check if the input mode and frame rate is valid */
 	pModeSetting =
@@ -1272,6 +1310,8 @@ static int ov5640_change_mode(enum ov5640_frame_rate frame_rate,
 {
 	int retval = 0;
 
+	pr_debug("ov5640_change_mode");
+
 	if (mode > ov5640_mode_MAX || mode < ov5640_mode_MIN) {
 		pr_err("Wrong ov5640 mode detected!\n");
 		return -1;
@@ -1324,6 +1364,7 @@ static int ioctl_s_power(struct v4l2_int_device *s, int on)
 {
 	struct sensor_data *sensor = s->priv;
 
+	pr_debug("ov5640 ioctl_s_power : %d", on);
 	if (on && !sensor->on) {
 		if (io_regulator)
 			if (regulator_enable(io_regulator) != 0)
@@ -1364,6 +1405,8 @@ static int ioctl_g_parm(struct v4l2_int_device *s, struct v4l2_streamparm *a)
 	struct sensor_data *sensor = s->priv;
 	struct v4l2_captureparm *cparm = &a->parm.capture;
 	int ret = 0;
+
+	pr_debug("ov5640 ioctl_g_parm ");
 
 	switch (a->type) {
 	/* This is the only case currently handled. */
@@ -1411,6 +1454,8 @@ static int ioctl_s_parm(struct v4l2_int_device *s, struct v4l2_streamparm *a)
 	u32 tgt_fps;	/* target frames per secound */
 	enum ov5640_frame_rate frame_rate;
 	int ret = 0;
+
+	pr_debug("ov5640 ioctl_s_parm ");
 
 	/* Make sure power on */
 	ov5640_power_down(POWER_ON);
@@ -1493,8 +1538,9 @@ static int ioctl_g_fmt_cap(struct v4l2_int_device *s, struct v4l2_format *f)
 {
 	struct sensor_data *sensor = s->priv;
 
-	f->fmt.pix = sensor->pix;
+	pr_debug("ov5640 ioctl_g_fmt_cap");
 
+	f->fmt.pix = sensor->pix;
 	return 0;
 }
 
@@ -1510,6 +1556,8 @@ static int ioctl_g_fmt_cap(struct v4l2_int_device *s, struct v4l2_format *f)
 static int ioctl_g_ctrl(struct v4l2_int_device *s, struct v4l2_control *vc)
 {
 	int ret = 0;
+
+	pr_debug("ov5640 ioctl_g_ctrl");
 
 	switch (vc->id) {
 	case V4L2_CID_BRIGHTNESS:
@@ -1604,6 +1652,8 @@ static int ioctl_s_ctrl(struct v4l2_int_device *s, struct v4l2_control *vc)
 static int ioctl_enum_framesizes(struct v4l2_int_device *s,
 				 struct v4l2_frmsizeenum *fsize)
 {
+	pr_debug("ov5640 ioctl_enum_framesizes");
+
 	if (fsize->index > ov5640_mode_MAX)
 		return -EINVAL;
 
@@ -1629,6 +1679,8 @@ static int ioctl_enum_frameintervals(struct v4l2_int_device *s,
 					 struct v4l2_frmivalenum *fival)
 {
 	int i, j, count;
+
+	pr_debug("ov5640 ioctl_enum_frameintervals");
 
 	if (fival->index < 0 || fival->index > ov5640_mode_MAX)
 		return -EINVAL;
@@ -1685,7 +1737,7 @@ static int ioctl_g_chip_ident(struct v4l2_int_device *s, int *id)
  */
 static int ioctl_init(struct v4l2_int_device *s)
 {
-
+	pr_debug("ov5640 ioctl_init");
 	return 0;
 }
 
@@ -1699,6 +1751,7 @@ static int ioctl_init(struct v4l2_int_device *s)
 static int ioctl_enum_fmt_cap(struct v4l2_int_device *s,
 			      struct v4l2_fmtdesc *fmt)
 {
+	pr_debug("ov5640 ioctl_enum_fmt_cap");
 	if (fmt->index > ov5640_mode_MAX)
 		return -EINVAL;
 
@@ -1721,6 +1774,7 @@ static int ioctl_dev_init(struct v4l2_int_device *s)
 	enum ov5640_frame_rate frame_rate;
 	int ret;
 
+	pr_debug("ov5640 ioctl_dev_init");
 	ov5640_data.on = true;
 
 	/* mclk */
@@ -1755,6 +1809,7 @@ static int ioctl_dev_init(struct v4l2_int_device *s)
  */
 static int ioctl_dev_exit(struct v4l2_int_device *s)
 {
+	pr_debug("ov5640 ioctl_dev_exit");
 	return 0;
 }
 
@@ -1820,6 +1875,8 @@ static int ov5640_probe(struct i2c_client *client,
 	struct device *dev = &client->dev;
 	int retval;
 	u8 chip_id_high, chip_id_low;
+
+	pr_debug("ov5640_probe");
 
 	/* ov5640 pinctrl */
 	pinctrl = devm_pinctrl_get_select_default(dev);
@@ -1932,6 +1989,8 @@ static int ov5640_probe(struct i2c_client *client,
  */
 static int ov5640_remove(struct i2c_client *client)
 {
+	pr_debug("ov5640_remove");
+
 	v4l2_int_device_unregister(&ov5640_int_device);
 
 	if (analog_regulator)
