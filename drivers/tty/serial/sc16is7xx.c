@@ -1275,7 +1275,6 @@ static struct regmap_config regcfg = {
 #ifdef CONFIG_SERIAL_SC16IS7XX_SPI
 static int sc16is7xx_spi_probe(struct spi_device *spi)
 {
-        garbage
 	struct sc16is7xx_devtype *devtype;
 	unsigned long flags = 0;
 	struct regmap *regmap;
